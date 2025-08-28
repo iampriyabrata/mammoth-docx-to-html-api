@@ -34,8 +34,11 @@ export async function POST(request: Request) {
     const arrayBuffer = await res.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // @ts-ignore (mammoth typings issue)
-    const { value: html } = await mammoth.convertToHtml({ buffer });
+    // Convert DOCX → HTML
+    const { value: rawHtml } = await mammoth.convertToHtml({ buffer });
+
+    // Replace any <img> tags with <p><u>[Image]</u></p>
+    const html = rawHtml.replace(/<img[^>]*>/gi, '<p><u>[Image]</u></p>');
 
     return NextResponse.json({
       success: true,
